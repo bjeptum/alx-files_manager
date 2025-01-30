@@ -3,7 +3,8 @@ import { createClient } from 'redis';
 class RedisClient {
   constructor() {
     this.client = createClient();
-    this.client.on('err', (err) => {
+
+    this.client.on('error', (err) => {
       console.error('Redis Client Error:', err);
     });
 
@@ -28,9 +29,9 @@ class RedisClient {
     try {
       const valueStr = String(value);
       if (duration > 0) {
-        await this.client.setEx(key, duration, valueStr);
+        await this.client.setEx(key, duration, valueStr); // set with expiration
       } else {
-        await this.client.set(key, valueStr);
+        await this.client.set(key, valueStr); // set without expiration
       }
     } catch (err) {
       console.error('Error setting data in Redis:', err);
@@ -51,7 +52,7 @@ class RedisClient {
   }
 
   disconnect() {
-    this.client.quit();
+    this.client.disconnect();
   }
 }
 
