@@ -41,6 +41,10 @@ class RedisClient {
       console.error('Error deleting key from Redis:', err);
     }
   }
+
+  disconnect() {
+    this.client.quit();
+  }
 }
 
 export default new RedisClient();
