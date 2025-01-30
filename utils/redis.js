@@ -3,6 +3,10 @@ import { createClient } from 'redis';
 class RedisClient {
   constructor() {
     this.client = createClient();
+    this.client.on('err', (err) => {
+      console.error('Redis Client Error:', err);
+    });
+
     this.client.connect();
   }
 
@@ -20,10 +24,14 @@ class RedisClient {
     }
   }
 
-  async set(key, value, duration) {
+  async set(key, value, duration = 0) {
     try {
       const valueStr = String(value);
-      await this.client.setEx(key, duration, valueStr);
+      if (duration > 0) {
+        await this.client.setEx(key, duration, valueStr);
+      } else {
+        await this.client.set(key, valueStr);
+      }
     } catch (err) {
       console.error('Error setting data in Redis:', err);
     }
@@ -47,4 +55,5 @@ class RedisClient {
   }
 }
 
-export default new RedisClient();
+const redisClient = new RedisClient();
+export default redisClient;
