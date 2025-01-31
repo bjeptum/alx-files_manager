@@ -8,11 +8,23 @@ class RedisClient {
       console.error('Redis Client Error:', err);
     });
 
-    this.client.connect();
+    this.client.on('connect', () => {
+      console.log('Redis client connected successfully');
+    });
+
+    this.isClientConnected = false;
+
+    this.client.on('ready', () => {
+      this.isClientConnected = true;
+    });
+    this.client.on('end', () => {
+      this.isClientConnected = false;
+      console.log('Redis client disconnected');
+    });
   }
 
   isAlive() {
-    return this.client.isOpen;
+    return this.client.connected;
   }
 
   async get(key) {
@@ -49,10 +61,6 @@ class RedisClient {
     } catch (err) {
       console.error('Error deleting key from Redis:', err);
     }
-  }
-
-  disconnect() {
-    this.client.disconnect();
   }
 }
 
